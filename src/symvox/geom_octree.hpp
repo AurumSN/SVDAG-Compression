@@ -29,6 +29,8 @@
 #include <symvox/scene.hpp>
 #include <symvox/octree.hpp>
 
+#include <cstdint>
+
 class GeomOctree : public Octree {
 
 public:

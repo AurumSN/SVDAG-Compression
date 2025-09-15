@@ -208,4 +208,35 @@ IF(BUILD_SVVIEWER)
 		${ADDITIONAL_LIBRARIES}
 	)
 
+
+	# Add source code
+	ADD_EXECUTABLE( svsnapshot
+		src/svsnapshot/main.cpp
+		src/svviewer/camera.hpp
+		src/svviewer/camera.cpp
+		src/svviewer/glslprogram.hpp
+		src/svviewer/glslprogram.cpp
+		src/svviewer/screenquadrenderer.hpp
+		src/svviewer/screenquadrenderer.cpp
+		src/svviewer/renderer.hpp
+		src/svviewer/renderer_monitor.hpp
+		src/svviewer/renderer_monitor.cpp
+		src/svviewer/octree_dda_renderer.hpp
+		src/svviewer/octree_dda_renderer.cpp
+		src/svviewer/halton.hpp
+		src/svviewer/halton.cpp
+		${SRC_IMGUI}
+	)
+
+	TARGET_LINK_LIBRARIES( svsnapshot 
+		symvox
+		${OPENGL_LIBRARIES}
+		${GLFW_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${CMAKE_DL_LIBS}
+		${ADDITIONAL_LIBRARIES}
+	)
+
 ENDIF(BUILD_SVVIEWER)
+
+
