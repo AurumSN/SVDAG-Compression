@@ -32,28 +32,13 @@
 #include "../svviewer/renderer_monitor.hpp"
 #include "../svviewer/octree_dda_renderer.hpp"
 
-#define UPDATE_INFO_TIME 200.0 // ms
-#define SCREEN_WIDTH	1280
-#define SCREEN_HEIGHT	720
-
-bool finish = false;
-bool printCamera = false;
-float frameTime = 0;
-std::string filename = "";
-static char filenameInput[128] = "";
-static char filenameInput2[128] = "";
-
-static char recordingInput[128] = "";
-static char loadRecordingInput[128] = "";
-
 OctreeDDARenderer * renderer;
 EncodedOctree* encoded_octree;
-RendererMonitor::FrameStats frameStats;
 GLFWwindow * window;
 Camera * cam;
 
 bool loadFile(std::string inputFile) {
-	filename = sl::pathname_base(inputFile);
+	std::string filename = sl::pathname_base(inputFile);
 	std::string ext = sl::pathname_extension(inputFile);
 	bool incorrectFile = false;
 
@@ -81,33 +66,39 @@ bool loadFile(std::string inputFile) {
 int main(int argc, char ** argv)
 {
 	// Arguments parsing
-	if (argc < 17) {
-		printf("Usage: svsnapshot model.[svdag | ussvdag | ssvdag] [position x y z] [target x y z] [up x y z] [fovy] [z_near] [z_far] [light_pos x y z]\n");
+	if (argc < 18) {
+		printf("Usage: svsnapshot model.[svdag | ussvdag | ssvdag] [output_file *.bmp] [resolution width height] [position x y z] [target x y z] [up_direction y | z] [fovy] [z_near] [z_far] [light_dir x y z]\n");
 		exit(1);
 	}
 
-    float p_x = atof(argv[2]);
-    float p_y = atof(argv[3]);
-    float p_z = atof(argv[4]);
+	int r_w = atoi(argv[3]);
+	int r_h = atoi(argv[4]);
 
-    float t_x = atof(argv[5]);
-    float t_y = atof(argv[6]);
-    float t_z = atof(argv[7]);
+    float p_x = atof(argv[5]);
+    float p_y = atof(argv[6]);
+    float p_z = atof(argv[7]);
 
-    float u_x = atof(argv[8]);
-    float u_y = atof(argv[9]);
-    float u_z = atof(argv[10]);
+    float t_x = atof(argv[8]);
+    float t_y = atof(argv[9]);
+    float t_z = atof(argv[10]);
 
-    float fovy = atof(argv[11]);
-    float z_near = atof(argv[12]);
-    float z_far = atof(argv[13]);
+	bool y_up = false;
 
-    float l_x = atof(argv[14]);
-    float l_y = atof(argv[15]);
-    float l_z = atof(argv[16]);
+	if (argv[11][0] == 'y' || argv[11][0] == 'Y') {
+		y_up = true;
+	}
+
+    float fovy = atof(argv[12]);
+    float z_near = atof(argv[13]);
+    float z_far = atof(argv[14]);
+
+    float l_x = atof(argv[15]);
+    float l_y = atof(argv[16]);
+    float l_z = atof(argv[17]);
 
 
 	std::string inputFile(argv[1]);
+	std::string outputFile(argv[2]);
 
 	bool incorrectFile = loadFile(inputFile);
 
@@ -119,7 +110,7 @@ int main(int argc, char ** argv)
 	}
 
 	renderer = new OctreeDDARenderer(encoded_octree);
-	renderer->setScreenResolution(SCREEN_WIDTH, SCREEN_HEIGHT);
+	renderer->setScreenResolution(r_w, r_h);
 
 	// Initialise GLFW --------------------------------
 	if (!glfwInit()) {
@@ -134,7 +125,7 @@ int main(int argc, char ** argv)
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Voxelator Viewer | Loading...", NULL, NULL);
+	window = glfwCreateWindow(r_w, r_h, "Voxelator Viewer | Loading...", NULL, NULL);
 
 	if (!window) {
 		std::cerr << "ERROR: Can't open the window" << std::endl;
@@ -146,7 +137,7 @@ int main(int argc, char ** argv)
 	sl::aabox3f sceneBBox = renderer->getSceneBBox();
 	cam->setInitCamera(sl::point3f(p_x, p_y, p_z),
 		sl::point3f(t_x, t_y, t_z),
-		(u_y > 0.0f ? Camera::Y_UP : Camera::Z_UP),
+		(y_up ? Camera::Y_UP : Camera::Z_UP),
 		fovy,
 		z_near,
 		z_far);
@@ -169,7 +160,12 @@ int main(int argc, char ** argv)
 	renderer->init();
 	renderer->selectRenderMode(OctreeDDARenderer::VIEWER);
     renderer->setViewerRenderMode(3);
-    renderer->toggleRandomColors();
+	if (renderer->getRandomColors()) {
+    	renderer->toggleRandomColors();
+	}
+	if (renderer->getShadowsEnabled()) {
+		renderer->toggleShadowsEnabled();
+	}
 	renderer->clearState();
 	renderer->resetState();
 	renderer->toggleRenderingStats();
@@ -179,7 +175,7 @@ int main(int argc, char ** argv)
 
     glClear(GL_COLOR_BUFFER_BIT);
     renderer->draw();
-    renderer->saveLastFrameBMP("output.bmp");
+    renderer->saveLastFrameBMP(outputFile);
 
     glfwTerminate();
 

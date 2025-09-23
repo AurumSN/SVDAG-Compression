@@ -754,11 +754,11 @@ void main() {
 			hitNorm = normalize(smoothNorm);
 
 			// ====Diffuse shading====
-			vec3 lightDir = normalize(lightPos - hitPos);
-			t *= 0.5 + 0.5 * max(dot(hitNorm, lightDir), 0);
+			//vec3 lightDir = normalize(lightPos - hitPos);
+			t *= 0.5 + 0.5 * max(dot(hitNorm, -normalize(lightPos)), 0);
 
 			// Light fall-off
-			t -= 0.2 * distance(hitPos, lightPos) / length(sceneBBoxMax-sceneBBoxMin);
+			//t -= 0.2 * distance(hitPos, lightPos) / length(sceneBBoxMax-sceneBBoxMin);
 			// Traversal depth (looks nice without beam opt)
 			// t *=  1. - (result.z / float(maxIters));
 		}
