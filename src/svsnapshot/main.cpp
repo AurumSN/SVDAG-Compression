@@ -135,14 +135,20 @@ int main(int argc, char ** argv)
 
 	cam = new Camera(window);
 	sl::aabox3f sceneBBox = renderer->getSceneBBox();
-	cam->setInitCamera(sl::point3f(p_x, p_y, p_z),
-		sl::point3f(t_x, t_y, t_z),
+	sl::vector3f pos = sl::vector3f(p_x * sceneBBox.diagonal()[0], p_y * sceneBBox.diagonal()[1], p_z * sceneBBox.diagonal()[2]);
+	sl::vector3f tar = sl::vector3f(t_x * sceneBBox.diagonal()[0], t_y * sceneBBox.diagonal()[1], t_z * sceneBBox.diagonal()[2]);
+	cam->setInitCamera(sceneBBox.center() + pos,
+		sceneBBox.center() + tar,
 		(y_up ? Camera::Y_UP : Camera::Z_UP),
 		fovy,
 		z_near,
 		z_far);
-
-	cam->setWalkFactor(sceneBBox.diagonal().two_norm() * 0.001f);
+	// cam->setInitCamera(sl::point3f(p_x, p_y, p_z),
+	// 	sl::point3f(t_x, t_y, t_z),
+	// 	(y_up ? Camera::Y_UP : Camera::Z_UP),
+	// 	fovy,
+	// 	z_near,
+	// 	z_far);
 
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
@@ -165,6 +171,9 @@ int main(int argc, char ** argv)
 	}
 	if (renderer->getShadowsEnabled()) {
 		renderer->toggleShadowsEnabled();
+	}
+	if (renderer->getFreqColors()) {
+		renderer->toggleFreqColors();
 	}
 	renderer->clearState();
 	renderer->resetState();

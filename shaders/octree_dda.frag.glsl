@@ -755,7 +755,7 @@ void main() {
 
 			// ====Diffuse shading====
 			//vec3 lightDir = normalize(lightPos - hitPos);
-			t *= 0.5 + 0.5 * max(dot(hitNorm, -normalize(lightPos)), 0);
+			t *= 0.25 + (2.0 / 3.0) * max(dot(hitNorm, normalize(lightPos)), 0);
 
 			// Light fall-off
 			//t -= 0.2 * distance(hitPos, lightPos) / length(sceneBBoxMax-sceneBBoxMin);
@@ -829,7 +829,8 @@ void main() {
 		// else if (
 			|| result.x == -4.) // no intersection, out of BBox => background
 		{ 
-			color = vec3(1);// 0.5 * (screenCoords.y + 1) * vec3(0.3,0.2,0.9);
+			//color = vec3(1);// 0.5 * (screenCoords.y + 1) * vec3(0.3,0.2,0.9);
+			color = vec3(0, 0, 1);
 		}
 		
 		else if (result.x == -3.) // too many iterations
