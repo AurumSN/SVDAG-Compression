@@ -135,10 +135,11 @@ int main(int argc, char ** argv)
 
 	cam = new Camera(window);
 	sl::aabox3f sceneBBox = renderer->getSceneBBox();
-	sl::vector3f pos = sl::vector3f(p_x * sceneBBox.diagonal()[0], p_y * sceneBBox.diagonal()[1], p_z * sceneBBox.diagonal()[2]);
-	sl::vector3f tar = sl::vector3f(t_x * sceneBBox.diagonal()[0], t_y * sceneBBox.diagonal()[1], t_z * sceneBBox.diagonal()[2]);
-	cam->setInitCamera(sceneBBox.center() + pos,
-		sceneBBox.center() + tar,
+	float maxD = sceneBBox.diagonal().amax() * 0.5f;
+	sl::vector3f pos = sl::vector3f(p_x + 1, p_y + 1, p_z + 1) * maxD;
+	sl::vector3f tar = sl::vector3f(t_x + 1, t_y + 1, t_z + 1) * maxD;
+	cam->setInitCamera(sceneBBox.corner(0) + pos,
+		sceneBBox.corner(0) + tar,
 		(y_up ? Camera::Y_UP : Camera::Z_UP),
 		fovy,
 		z_near,
