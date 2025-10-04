@@ -153,7 +153,7 @@ public:
 
         std::string nT = std::to_string((int) omp_get_max_threads());
         std::string I = std::to_string(inflation);
-        std::string cmd = "$HOME/local/bin/mcl " + fnIn + " --abc -I " + I + " -q x -V all -te " + nT + " -o " + fnOut; // -scheme 1
+        std::string cmd = "/bin/mcl " + fnIn + " --abc -I " + I + " -q x -V all -te " + nT + " -o " + fnOut; // -scheme 1
 //        std::string cmd = "export OMP_NUM_THREADS=" + nT + "; ../../hipmcl/bin/hipmcl -M " + fnIn + " -I 2.0 -per-process-mem 0.1 -o " + fnOut;
 
         int res = std::system(cmd.c_str());
@@ -183,10 +183,10 @@ public:
         clusterFile.close();
 
         // Todo: Remove files
-#if 0
-        std::remove(fnIn);
-        std::remove(fnOut);
-#endif
+//#if 0
+        std::remove(fnIn.c_str());
+        std::remove(fnOut.c_str());
+//#endif
 
         return clusters;
     }

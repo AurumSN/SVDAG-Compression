@@ -217,17 +217,17 @@ int main(int argc, char ** argv) {
 	std::string paramStr = "-l_" + trimmedInfl + "_" + trimmedLossFact + "_" + std::to_string(includedNodeRefCount);
 
 	// Save base SVDAG and ESVDAG in any case
-	EncodedSVDAG svdag2;
-	svdag2.encode(octree);
-	svdag2.save(basePath + ".svdag");
+	// EncodedSVDAG svdag2;
+	// svdag2.encode(octree);
+	// svdag2.save(basePath + ".svdag");
 
 	
 
-	if (lossy) {
-		EncodedSSVDAG esvdag2;
-		esvdag2.encode(octree);
-		esvdag2.save(basePath + ".esvdag");
-	}
+	// if (lossy) {
+	// 	EncodedSSVDAG esvdag2;
+	// 	esvdag2.encode(octree);
+	// 	esvdag2.save(basePath + ".esvdag");
+	// }
 
 	if (lossy) {
 		auto origDagTime = octree.getStats().toDAGTime; // since toDag is also called on the lossy dag, restore original dag time
@@ -253,22 +253,22 @@ int main(int argc, char ** argv) {
 	EncodedSSVDAG ssvdag;
 	if (!multiLevel) ssvdag.encode(octree);
 
-    bool saveAll = true;
+    // bool saveAll = false;//true;
 
-    if (saveAll) {
-		std::string infix = "";
-		if (lossy)
-			infix += paramStr;
-		else if (multiLevel)
-			infix += "-multi";
+    // if (saveAll) {
+	// 	std::string infix = "";
+	// 	if (lossy)
+	// 		infix += paramStr;
+	// 	else if (multiLevel)
+	// 		infix += "-multi";
 		
-        svdag.save(basePath + infix + ".svdag");
-		if (!multiLevel) {
-			ussvdag.save(basePath + infix + ".ussvdag");
-			ssvdag.save(basePath + infix + ".ssvdag");
-			esvdag.save(basePath + infix + ".esvdag");
-		}
-    } 
+    //     svdag.save(basePath + infix + ".svdag");
+	// 	if (!multiLevel) {
+	// 		ussvdag.save(basePath + infix + ".ussvdag");
+	// 		ssvdag.save(basePath + infix + ".ssvdag");
+	// 		esvdag.save(basePath + infix + ".esvdag");
+	// 	}
+    // } 
 
 	for (int i = 4; i < argc; ++i) {
 		std::string outputFile = argv[i];
@@ -317,53 +317,53 @@ int main(int argc, char ** argv) {
 	printf("Total time         : %s\n", sl::human_readable_duration(totalTime).c_str());
 	printf("===================================================================\n\n");
 
-	FILE *baseStdout = stdout;
-	// Print to console and to stats file
-	for (int i = 0; i < 2; i++) {
-		if (i == 1) {
-// Print to file
-#if WIN32
-			freopen("stats.txt", "a", stdout);
-#else
-			stdout = fopen("stats.txt", "a");
-#endif
-		}
-		printf("%s, %d, lossy: %d, cross-level: %d\n", baseName.c_str(), nLevels, lossy, multiLevel);
-		printf("#Voxels, %zu\n", stats.nTotalVoxels);
-		printf(", SVDAG, ESVDAG, SSVDAG, SVO\n");
-		printf("#nodes, %zu, '', %zu, %zu\n", stats.nNodesDAG, stats.nNodesSDAG, stats.nNodesSVO);
-		printf("memory (bytes), %zu, %zu, %zu, %zu\n", svdag.getDataSize(), esvdag.getDataSize(), ssvdag.getDataSize(), stats.nNodesSVO);
+// 	FILE *baseStdout = stdout;
+// 	// Print to console and to stats file
+// 	for (int i = 0; i < 2; i++) {
+// 		if (i == 1) {
+// // Print to file
+// #if WIN32
+// 			freopen("stats.txt", "a", stdout);
+// #else
+// 			stdout = fopen("stats.txt", "a");
+// #endif
+// 		}
+// 		printf("%s, %d, lossy: %d, cross-level: %d\n", baseName.c_str(), nLevels, lossy, multiLevel);
+// 		printf("#Voxels, %zu\n", stats.nTotalVoxels);
+// 		printf(", SVDAG, ESVDAG, SSVDAG, SVO\n");
+// 		printf("#nodes, %zu, '', %zu, %zu\n", stats.nNodesDAG, stats.nNodesSDAG, stats.nNodesSVO);
+// 		printf("memory (bytes), %zu, %zu, %zu, %zu\n", svdag.getDataSize(), esvdag.getDataSize(), ssvdag.getDataSize(), stats.nNodesSVO);
 		
-		if (lossy) {
-			printf("Construction times:\n");
-			printf(",SVDAG, LSVDAG, Total, Hashing, SimNodes, Clustering\n");
-			printf("time (ms), %zu, %zu, %zu, %zu, %zu, %zu\n", stats.toDAGTime.as_milliseconds(), stats.toLSVDAGTime.as_milliseconds(), totalTime.as_milliseconds(), stats.lHashing.as_milliseconds(), stats.lSimNodes.as_milliseconds(), stats.lClustering.as_milliseconds());
+// 		if (lossy) {
+// 			printf("Construction times:\n");
+// 			printf(",SVDAG, LSVDAG, Total, Hashing, SimNodes, Clustering\n");
+// 			printf("time (ms), %zu, %zu, %zu, %zu, %zu, %zu\n", stats.toDAGTime.as_milliseconds(), stats.toLSVDAGTime.as_milliseconds(), totalTime.as_milliseconds(), stats.lHashing.as_milliseconds(), stats.lSimNodes.as_milliseconds(), stats.lClustering.as_milliseconds());
 
-			printf("Lossy stats, %.2f, %.2f, %i\n", lossyInflation, allowedLossyDiffFactor, includedNodeRefCount);
-			printf("TotalVoxDifference, #NodesIn, #ClustersOut, #edges, svdag mem, lsvdag mem\n");
-			printf("%zu, %zu, %zu, %zu, %zu, %zu\n", stats.totalLossyVoxelDifference, stats.nClusteredNodes, stats.nClusters, stats.nEdges, svdag2.getDataSize(), svdag.getDataSize());
-		} else if (multiLevel) {
-			printf("Construction times:\n");
-			printf(",SVDAG, Total, Cross-level\n");
-			printf("time (ms), %zu, %zu, %zu\n", stats.toDAGTime.as_milliseconds(), totalTime.as_milliseconds(), stats.crossMergeTime.as_milliseconds());
+// 			printf("Lossy stats, %.2f, %.2f, %i\n", lossyInflation, allowedLossyDiffFactor, includedNodeRefCount);
+// 			printf("TotalVoxDifference, #NodesIn, #ClustersOut, #edges, svdag mem, lsvdag mem\n");
+// 			printf("%zu, %zu, %zu, %zu, %zu, %zu\n", stats.totalLossyVoxelDifference, stats.nClusteredNodes, stats.nClusters, stats.nEdges, svdag2.getDataSize(), svdag.getDataSize());
+// 		} else if (multiLevel) {
+// 			printf("Construction times:\n");
+// 			printf(",SVDAG, Total, Cross-level\n");
+// 			printf("time (ms), %zu, %zu, %zu\n", stats.toDAGTime.as_milliseconds(), totalTime.as_milliseconds(), stats.crossMergeTime.as_milliseconds());
 
-			printf("Cross-level, nodes eliminated, svdag mem, csvdag mem\n");
-			printf(", %zu, %zu, %zu\n", stats.nCrossLevelMerged, svdag2.getDataSize(), svdag.getDataSize());
-		}else {
-			printf("Construction times:\n");
-			printf(",SVDAG, Total\n");
-			printf("time (ms), %zu, %zu\n", stats.toDAGTime.as_milliseconds(), totalTime.as_milliseconds());
-		}
-		printf("\n\n");
-	}
-	fclose(stdout);
+// 			printf("Cross-level, nodes eliminated, svdag mem, csvdag mem\n");
+// 			printf(", %zu, %zu, %zu\n", stats.nCrossLevelMerged, svdag2.getDataSize(), svdag.getDataSize());
+// 		}else {
+// 			printf("Construction times:\n");
+// 			printf(",SVDAG, Total\n");
+// 			printf("time (ms), %zu, %zu\n", stats.toDAGTime.as_milliseconds(), totalTime.as_milliseconds());
+// 		}
+// 		printf("\n\n");
+// 	}
+// 	fclose(stdout);
 
-	// Restore stdout to default
-#if WIN32
-	freopen("CONOUT$", "w", stdout);
-#else
-	stdout = baseStdout;
-#endif
+// 	// Restore stdout to default
+// #if WIN32
+// 	freopen("CONOUT$", "w", stdout);
+// #else
+// 	stdout = baseStdout;
+// #endif
 
 
 	return 0;

@@ -254,9 +254,9 @@ void Scene::loadObj(std::string fileName, bool tryLoadBinCache, bool loadMateria
 	_materials.shrink_to_fit();
 	_indexedTris.shrink_to_fit();
 
-	printf("\t- Saving '%s' binary cache... ", (fileName + ".bincache").c_str());
-	saveBinObj(fileName + ".bincache");
-	printf("OK!\n");
+	// printf("\t- Saving '%s' binary cache... ", (fileName + ".bincache").c_str());
+	// saveBinObj(fileName + ".bincache");
+	// printf("OK!\n");
 
 	fclose(file);
 
